@@ -2,6 +2,8 @@ package com.jobportal.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ExperienceRepo extends JpaRepository<ExperienceRepo, Long>{
+import com.jobportal.entity.Experience;
+
+public interface ExperienceRepo extends JpaRepository<Experience, Long>{
 
 }

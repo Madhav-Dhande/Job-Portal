@@ -1,0 +1,23 @@
+.companies-section{
+    background:#fff;
+}
+
+.company-card{
+    text-align:center;
+    background:white;
+    border-radius:12px;
+    padding:25px;
+    transition:.3s;
+}
+
+.company-card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 10px 25px rgba(0,0,0,.1);
+}
+
+.company-card img{
+    width:70px;
+    height:70px;
+    object-fit:contain;
+    margin-bottom:15px;
+}

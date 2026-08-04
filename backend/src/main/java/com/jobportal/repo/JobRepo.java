@@ -2,8 +2,8 @@ package com.jobportal.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.jobportal.entity.User;
+import com.jobportal.entity.Job;
 
-public interface UserRepo extends JpaRepository<User, Long> {
+public interface JobRepo extends JpaRepository<Job, Long> {
 
 }

@@ -1,5 +1,5 @@
 package com.jobportal.repo;
 
-public interface Person {
+public interface SkillRepo {
 
 }

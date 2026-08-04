@@ -1,5 +1,5 @@
 package com.jobportal.repo;
 
-public interface Skill {
+public interface SavedJobRepo {
 
 }

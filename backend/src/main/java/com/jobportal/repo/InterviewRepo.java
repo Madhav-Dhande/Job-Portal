@@ -2,6 +2,8 @@ package com.jobportal.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface InterviewRepo extends JpaRepository<InterviewRepo, Long> {
+import com.jobportal.entity.Interview;
+
+public interface InterviewRepo extends JpaRepository<Interview, Long> {
 
 }

@@ -1,0 +1,21 @@
+.featured{
+    background:#f8f9fa;
+}
+
+.job-card{
+    background:#fff;
+    border-radius:12px;
+    padding:20px;
+    transition:.3s;
+    height:100%;
+}
+
+.job-card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 10px 25px rgba(0,0,0,.1);
+}
+
+.salary{
+    color:#0d6efd;
+    font-weight:bold;
+}

@@ -36,6 +36,8 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse register(RegisterRequest request) {
+    	
+    	System.out.println("Params=======+"+request);
 
         // 1. Check email
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -54,7 +56,6 @@ public class AuthServiceImpl implements AuthService {
                                 "Role not found"
                         )
                 );
-
 
         // 3. Create user
         User user = new User();

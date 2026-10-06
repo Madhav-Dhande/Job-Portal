@@ -1,35 +1,82 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Register.css";
-import { register } from "../../services/AuthService";
+import { register, getRoles } from "../../services/AuthService";
 
 const Register = () => {
-
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    fullName: "",
+    firstName: "",
+    lastName: "",
+    mobile: "",
     email: "",
     password: "",
-    role: "Candidate",
+    roleId: "",
   });
 
+  const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [rolesLoading, setRolesLoading] = useState(true);
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
-  const handleChange = (e) => {
+  // Fetch roles when the Register page loads
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        setRolesLoading(true);
 
+        const response = await getRoles();
+        console.log("Roles API Response:", response.data.data);
+
+        // Assumes the API returns an array of role objects
+        const roleList = response.data.data;
+
+        setRoles(roleList);
+
+        const candidateRole = roleList.find(
+          (role) =>
+            role.name?.replace(/^ROLE_/i, "").toLowerCase() === "candidate",
+        );
+
+        setFormData((prev) => ({
+          ...prev,
+          roleId: candidateRole ? String(candidateRole.id) : "",
+        }));
+
+        if (candidateRole) {
+          setFormData((prev) => ({
+            ...prev,
+            role: candidateRole.name,
+          }));
+        } else {
+          setFormData((prev) => ({
+            ...prev,
+            role: "",
+          }));
+        }
+      } catch (error) {
+        console.error("Error fetching roles:", error);
+        setErrorMsg("Failed to load roles. Please try again.");
+      } finally {
+        setRolesLoading(false);
+      }
+    };
+
+    fetchRoles();
+  }, []);
+
+  const handleChange = (e) => {
     const { name, value } = e.target;
 
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [name]: value,
-    });
+    }));
   };
 
   const handleSubmit = async (e) => {
-
     e.preventDefault();
 
     setSuccessMsg("");
@@ -37,25 +84,21 @@ const Register = () => {
     setLoading(true);
 
     try {
-
       const response = await register(formData);
 
-      console.log("API Response:", response.data);
+      console.log("Registration API Response:", response.data);
 
       setSuccessMsg("Account created successfully!");
 
       setFormData({
-        fullName: "",
+        firstName: "",
         email: "",
         password: "",
         role: "Candidate",
       });
 
-      // Redirect after successful registration
       navigate("/login");
-
     } catch (error) {
-
       console.error("Registration Error:", error);
 
       const message =
@@ -63,55 +106,48 @@ const Register = () => {
         "Registration failed. Please try again.";
 
       setErrorMsg(message);
-
     } finally {
-
       setLoading(false);
     }
   };
 
   return (
     <div className="register-page">
-
       <div className="register-card">
-
         <h2>Create Account</h2>
 
-        {successMsg && (
-          <div className="alert alert-success">
-            {successMsg}
-          </div>
-        )}
+        {successMsg && <div className="alert alert-success">{successMsg}</div>}
 
-        {errorMsg && (
-          <div className="alert alert-danger">
-            {errorMsg}
-          </div>
-        )}
+        {errorMsg && <div className="alert alert-danger">{errorMsg}</div>}
 
         <form onSubmit={handleSubmit}>
-
           <div className="mb-3">
-            <label htmlFor="fullName">
-              Full Name
-            </label>
-
+            <label htmlFor="firstName">First Name</label>
             <input
               type="text"
-              id="fullName"
-              name="fullName"
+              id="firstName"
+              name="firstName"
               className="form-control"
-              value={formData.fullName}
+              value={formData.firstName}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="lastName">Last Name</label>
+            <input
+              type="text"
+              id="lastName"
+              name="lastName"
+              className="form-control"
+              value={formData.lastName}
               onChange={handleChange}
               required
             />
           </div>
 
           <div className="mb-3">
-            <label htmlFor="email">
-              Email
-            </label>
-
+            <label htmlFor="email">Email</label>
             <input
               type="email"
               id="email"
@@ -122,12 +158,23 @@ const Register = () => {
               required
             />
           </div>
+          <div className="mb-3">
+            <label htmlFor="mobile">Mobile No.</label>
+            <input
+              type="tel"
+              id="mobile"
+              name="mobile"
+              className="form-control"
+              value={formData.mobile}
+              onChange={handleChange}
+              pattern="[0-9]{10}"
+              maxLength={10}
+              required
+            />
+          </div>
 
           <div className="mb-3">
-            <label htmlFor="password">
-              Password
-            </label>
-
+            <label htmlFor="password">Password</label>
             <input
               type="password"
               id="password"
@@ -136,44 +183,42 @@ const Register = () => {
               value={formData.password}
               onChange={handleChange}
               required
-              minLength="6"
+              minLength={6}
             />
           </div>
 
           <div className="mb-3">
-            <label htmlFor="role">
-              Role
-            </label>
-
+            <label htmlFor="roleId">Role</label>
             <select
-              id="role"
-              name="role"
+              id="roleId"
+              name="roleId"
               className="form-select"
-              value={formData.role}
+              value={formData.roleId}
               onChange={handleChange}
+              disabled={rolesLoading || roles.length === 0}
+              required
             >
-              <option value="Candidate">
-                Candidate
+              <option value="">
+                {rolesLoading ? "Loading roles..." : "Select Role"}
               </option>
 
-              <option value="Employer">
-                Employer
-              </option>
+              {roles.map((role) => (
+                <option key={role.id} value={String(role.id)}>
+                  {role.name}
+                </option>
+              ))}
             </select>
           </div>
 
           <button
             type="submit"
             className="btn btn-success w-100"
-            disabled={loading}
+            disabled={loading || rolesLoading || roles.length === 0}
           >
             {loading ? "Registering..." : "Register"}
           </button>
-
         </form>
-
       </div>
-
     </div>
   );
 };
